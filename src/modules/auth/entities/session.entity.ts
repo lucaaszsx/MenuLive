@@ -1,7 +1,7 @@
-import { BaseEntity } from "@/database/base.entity.js";
+import { BaseEntity } from "#/database/base.entity.js";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, type Relation } from "typeorm";
 import { RefreshTokenEntity } from "./refresh-token.entity.js";
-import { UserEntity } from "@/modules/users/user.entity.js";
+import { UserEntity } from "#/modules/users/user.entity.js";
 
 @Entity('sessions')
 export class SessionEntity extends BaseEntity {

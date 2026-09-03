@@ -3,14 +3,16 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import envConfig, { EnvConfig } from './config/env.js';
+import envConfig, { type EnvConfig } from './config/env.js';
+import { UserModule } from './modules/users/user.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
 
 @Module({
     imports: [
         // Environment setup
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: process.env.NODE_ENV === 'production'
+            envFilePath: process.env['NODE_ENV'] === 'production'
                 ? '.env.production'
                 : '.env.development',
             skipProcessEnv: true,
@@ -33,10 +35,15 @@ import envConfig, { EnvConfig } from './config/env.js';
                     password: configService.getOrThrow('db.pass', { infer: true }),
                     database: configService.getOrThrow('db.dbName', { infer: true }),
                     synchronize: !isProduction,
-                    logging: !isProduction
+                    logging: !isProduction,
+                    autoLoadEntities: true
                 };
             }
         }),
+        
+        // Application modules
+        AuthModule,
+        UserModule
     ],
     controllers: [AppController],
     providers: [AppService]

@@ -1,4 +1,4 @@
-import { BaseEntity } from "@/database/base.entity.js";
+import { BaseEntity } from "#/database/base.entity.js";
 import { Column, Entity, JoinColumn, ManyToOne, type Relation } from "typeorm";
 import { SessionEntity } from "./session.entity.js";
 
