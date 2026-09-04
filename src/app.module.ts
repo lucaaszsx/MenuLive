@@ -1,11 +1,12 @@
+import type { EnvConfig } from './config/env.js';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import envConfig, { type EnvConfig } from './config/env.js';
-import { UserModule } from './modules/users/user.module.js';
+import envConfig from './config/env.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { UserModule } from './modules/users/user.module.js';
 
 @Module({
     imports: [

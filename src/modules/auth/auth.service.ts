@@ -1,5 +1,6 @@
-import { type CreateUserData, UserService } from '../users/user.service.js';
+import type { CreateUserData } from '../users/user.service.js';
 import { Injectable } from '@nestjs/common';
+import { UserService } from '../users/user.service.js';
 
 @Injectable()
 export class AuthService {

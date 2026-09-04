@@ -15,9 +15,10 @@
 
     "importOrder": [
         "",
-        "<TYPES>^(node:)",
         "<TYPES>",
+        "<TYPES>^#.+",
         "<TYPES>^[.]",
+        "<TYPES>^(node:)",
         "^@nestjs/(.*)$",
         "<THIRD_PARTY_MODULES>",
         "^#.+",

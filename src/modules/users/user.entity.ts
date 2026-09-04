@@ -1,5 +1,6 @@
+import type { Relation } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '#/database/base.entity.js';
-import { Column, Entity, OneToMany, type Relation } from 'typeorm';
 import { SessionEntity } from '../auth/entities/session.entity.js';
 
 @Entity('users')

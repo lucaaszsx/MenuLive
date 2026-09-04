@@ -1,8 +1,8 @@
-import { UserAlreadyExistsException, UserNotFoundException } from './exceptions/index.js';
 import type { FindOptionsWhere, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity.js';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserAlreadyExistsException, UserNotFoundException } from './exceptions/index.js';
+import { UserEntity } from './user.entity.js';
 
 export interface CreateUserData {
     username: string;
