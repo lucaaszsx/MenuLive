@@ -1,6 +1,6 @@
-import { BaseEntity } from "#/database/base.entity.js";
-import { Column, Entity, OneToMany, type Relation } from "typeorm";
-import { SessionEntity } from "../auth/entities/session.entity.js";
+import { BaseEntity } from '#/database/base.entity.js';
+import { Column, Entity, OneToMany, type Relation } from 'typeorm';
+import { SessionEntity } from '../auth/entities/session.entity.js';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {

@@ -12,9 +12,8 @@ import { AuthModule } from './modules/auth/auth.module.js';
         // Environment setup
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: process.env['NODE_ENV'] === 'production'
-                ? '.env.production'
-                : '.env.development',
+            envFilePath:
+                process.env['NODE_ENV'] === 'production' ? '.env.production' : '.env.development',
             skipProcessEnv: true,
             load: [envConfig]
         }),
@@ -40,7 +39,7 @@ import { AuthModule } from './modules/auth/auth.module.js';
                 };
             }
         }),
-        
+
         // Application modules
         AuthModule,
         UserModule

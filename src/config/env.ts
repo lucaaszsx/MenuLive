@@ -6,7 +6,9 @@ function getEnvVar(key: string): string {
 }
 
 function getEnvArray(key: string) {
-    return getEnvVar(key).split(',').map((el) => el.trim());
+    return getEnvVar(key)
+        .split(',')
+        .map((el) => el.trim());
 }
 
 /* function getOptEnvVar(key: string, fallback = null) {
@@ -21,7 +23,7 @@ const envConfig = () => ({
         prefix: getEnvVar('APP_PREFIX'),
         cors: {
             origins: getEnvArray('APP_CORS_ORIGINS'),
-            methods: getEnvArray('APP_CORS_METHODS'),
+            methods: getEnvArray('APP_CORS_METHODS')
         }
     },
 

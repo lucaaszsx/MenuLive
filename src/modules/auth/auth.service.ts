@@ -1,9 +1,11 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { type CreateUserData, UserService } from '../users/user.service.js';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
-    public async register(username: string, password: string) {
-        
+    constructor(private userService: UserService) {}
+
+    public async register(data: CreateUserData) {
+        return this.userService.createUser(data);
     }
 }

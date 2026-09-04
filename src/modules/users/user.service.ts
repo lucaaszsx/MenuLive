@@ -1,15 +1,15 @@
-import type { FindOptionsWhere, Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "./user.entity.js";
-import { Injectable } from "@nestjs/common";
+import { UserAlreadyExistsException, UserNotFoundException } from './exceptions/index.js';
+import type { FindOptionsWhere, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './user.entity.js';
+import { Injectable } from '@nestjs/common';
 
-interface CreateUserData {
-    name: string;
+export interface CreateUserData {
     username: string;
     password: string;
 }
 
-interface FindOneUserOptions {
+export interface FindOneUserOptions {
     id?: string;
     username?: string;
 }
@@ -22,23 +22,32 @@ export class UserService {
     ) {}
 
     public async createUser(data: CreateUserData) {
-        
+        if (await this.existsByUsername(data.username)) throw new UserAlreadyExistsException();
+
+        const user = this.userRepository.create(data);
+        return this.userRepository.save(user);
     }
 
     public async findOne(options: FindOneUserOptions) {
-        const where: FindOptionsWhere<UserEntity> = {};
-        if (options.id) where.id = options.id;
-        if (options.username) where.username = options.username;
+        const where: FindOptionsWhere<UserEntity>[] = [];
+        if (options.id) where.push({ id: options.id });
+        if (options.username) where.push({ username: options.username });
 
         const user = await this.userRepository.find({ where });
-        if (!user) throw new Error('USER_NOT_FOUND'); 
+        if (!user) throw new UserNotFoundException();
 
         return user;
     }
 
-    public async findWithPassword(options: FindOneUserOptions) {
+    public async findWithPassword(username: string) {
         const user = await this.userRepository
-            .createQueryBuilder();
+            .createQueryBuilder('user')
+            .addSelect('user.password')
+            .where('user.username = :username', { username })
+            .getOne();
+        if (!user) throw new UserNotFoundException();
+
+        return user;
     }
 
     public async existsById(id: string) {

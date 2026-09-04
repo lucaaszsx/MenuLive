@@ -1,7 +1,9 @@
-import { BaseEntity } from "#/database/base.entity.js";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, type Relation } from "typeorm";
-import { RefreshTokenEntity } from "./refresh-token.entity.js";
-import { UserEntity } from "#/modules/users/user.entity.js";
+import { BaseEntity } from '#/database/base.entity.js';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, type Relation } from 'typeorm';
+import { RefreshTokenEntity } from './refresh-token.entity.js';
+import { UserEntity } from '#/modules/users/user.entity.js';
+
+const IPV6_ADDR_LEN = 45;
 
 @Entity('sessions')
 export class SessionEntity extends BaseEntity {
@@ -11,6 +13,12 @@ export class SessionEntity extends BaseEntity {
     @ManyToOne(() => UserEntity, (user) => user.sessions, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     public user: Relation<UserEntity>;
+
+    @Column({ name: 'ip_address', type: 'varchar', length: IPV6_ADDR_LEN })
+    public ipAddress: string;
+
+    @Column({ name: 'user_agent', type: 'text' })
+    public userAgent: string;
 
     @Column({ name: 'revoked_at', type: 'timestamptz', nullable: true })
     public revokedAt: Date | null;
