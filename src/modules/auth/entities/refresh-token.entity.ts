@@ -8,7 +8,9 @@ export class RefreshTokenEntity extends BaseEntity {
     @Column({ name: 'session_id', type: 'uuid' })
     public sessionId: string;
 
-    @ManyToOne(() => SessionEntity, (session) => session.refreshTokens, { onDelete: 'CASCADE' })
+    @ManyToOne(() => SessionEntity, (session) => session.refreshTokens, {
+        onDelete: 'CASCADE'
+    })
     @JoinColumn({ name: 'session_id' })
     public session: Relation<SessionEntity>;
 

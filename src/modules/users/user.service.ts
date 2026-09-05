@@ -22,7 +22,8 @@ export class UserService {
     ) {}
 
     public async createUser(data: CreateUserData) {
-        if (await this.existsByUsername(data.username)) throw new UserAlreadyExistsException();
+        if (await this.existsByUsername(data.username))
+            throw new UserAlreadyExistsException();
 
         const user = this.userRepository.create(data);
         return this.userRepository.save(user);

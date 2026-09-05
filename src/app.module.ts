@@ -14,7 +14,9 @@ import { UserModule } from './modules/users/user.module.js';
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath:
-                process.env['NODE_ENV'] === 'production' ? '.env.production' : '.env.development',
+                process.env['NODE_ENV'] === 'production'
+                    ? '.env.production'
+                    : '.env.development',
             skipProcessEnv: true,
             load: [envConfig]
         }),
