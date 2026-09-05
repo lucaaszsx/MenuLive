@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiErrorCode } from '#/common/enums/api.enums.js';
+import { ApiErrorCode } from '#/common/enums/api-codes.enum.js';
 import { ApiHttpException } from '#/common/exceptions/api.exception.js';
 
 export class UserNotFoundException extends ApiHttpException {

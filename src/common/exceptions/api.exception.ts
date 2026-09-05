@@ -1,4 +1,4 @@
-import type { ApiErrorCode } from '../enums/api.enums.js';
+import type { ApiErrorCode } from '../enums/api-codes.enum.js';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 interface ApiHttpExceptionOptions {
