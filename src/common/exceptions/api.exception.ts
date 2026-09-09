@@ -8,7 +8,7 @@ interface ApiHttpExceptionOptions {
     status: HttpStatus;
 }
 
-export class ApiHttpException extends HttpException {
+export abstract class ApiHttpException extends HttpException {
     public readonly code: ApiErrorCode;
     public readonly details: string[];
 

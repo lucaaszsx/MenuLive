@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Ip, Post } from '@nestjs/common';
-import { UserAgent } from '#/common/decorators/index.js';
+import { UserAgent } from '#/common/decorators/user-agent.decorator.js';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO, LoginDTO } from './dto/index.js';
 
