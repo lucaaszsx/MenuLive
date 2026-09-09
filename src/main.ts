@@ -10,7 +10,6 @@ import { AppModule } from './app.module.js';
 import { ValidationFailedException } from './common/exceptions/validation-failed.exception.js';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor.js';
-//import { ValidationExceptionFilter } from './common/filters/validation-exception.filter.js';
 import { flattenValidationErrors } from './common/utils/flattenValidationErrors.js';
 
 async function bootstrap() {
