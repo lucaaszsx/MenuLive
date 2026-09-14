@@ -1,5 +1,5 @@
 import type { UserEntity } from '../../entities/user.entity.js';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, plainToInstance } from 'class-transformer';
 
 @Exclude()
 export class UserResponseDTO {
@@ -12,7 +12,7 @@ export class UserResponseDTO {
     @Expose()
     public createdAt: Date;
 
-    constructor(partial: Partial<UserEntity>) {
-        Object.assign(this, partial);
+    public static from(partial: Partial<UserEntity>) {
+        return plainToInstance(UserResponseDTO, partial);
     }
 }
