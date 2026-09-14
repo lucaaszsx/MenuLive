@@ -1,9 +1,9 @@
 import type { ValidationError } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { EnvConfig } from './config/env.js';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
@@ -34,6 +34,7 @@ async function bootstrap() {
         new ValidationPipe({
             transform: true,
             whitelist: true,
+            forbidNonWhitelisted: true,
 
             exceptionFactory: (errors: ValidationError[]) => {
                 const details = flattenValidationErrors(errors);
@@ -41,7 +42,12 @@ async function bootstrap() {
             }
         })
     );
-    app.useGlobalInterceptors(new TransformResponseInterceptor());
+    app.useGlobalInterceptors(
+        new TransformResponseInterceptor(),
+        new ClassSerializerInterceptor(app.get(Reflector), {
+            excludeExtraneousValues: true
+        })
+    );
     app.useGlobalFilters(new GlobalExceptionFilter(app.get(HttpAdapterHost)));
     app.setGlobalPrefix(configService.getOrThrow('app.prefix', { infer: true }));
 
