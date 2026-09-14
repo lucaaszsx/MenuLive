@@ -21,7 +21,4 @@ export class AuthController {
         @Ip() _ipAddress: string,
         @UserAgent() _userAgent: string
     ) {}
-
-    @Get('/@me')
-    public async getMe() {}
 }
