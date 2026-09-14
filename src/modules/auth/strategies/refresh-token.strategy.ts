@@ -5,8 +5,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
+import { COOKIE_REFRESH_TOKEN_NAME } from '#/common/constants.js';
 
-const refreshTokenfromCookie = (req: Request) => req?.cookies?.['refresh'];
+const refreshTokenfromCookie = (req: Request) =>
+    req?.cookies?.[COOKIE_REFRESH_TOKEN_NAME];
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
