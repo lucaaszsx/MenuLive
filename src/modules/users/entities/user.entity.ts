@@ -1,7 +1,10 @@
 import type { Relation } from 'typeorm';
-import { Column, Entity, OneToMany } from 'typeorm';
+import bcrypt from 'bcrypt';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '#/database/base.entity.js';
 import { SessionEntity } from '../../auth/entities/session.entity.js';
+
+const BCRYPT_SALT = 12;
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -9,7 +12,7 @@ export class UserEntity extends BaseEntity {
     public username: string;
 
     @Column({
-        type: 'char',
+        type: 'varchar',
         length: 255,
         select: false,
         comment: 'hashed password'
@@ -18,4 +21,10 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => SessionEntity, (session) => session.user)
     public sessions: Relation<SessionEntity[]>;
+
+    @BeforeInsert()
+    // @ts-expect-error
+    private async hashPassowrd() {
+        this.password = await bcrypt.hash(this.password, BCRYPT_SALT);
+    }
 }
