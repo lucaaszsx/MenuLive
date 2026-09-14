@@ -7,5 +7,7 @@ export enum ApiErrorCode {
 
     // User
     USER_ALREADY_EXISTS = 12_000,
-    USER_NOT_FOUND
+    USER_NOT_FOUND,
+    INVALID_CREDENTIALS,
+    UNAUTHORIZED
 }
