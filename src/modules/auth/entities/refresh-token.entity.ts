@@ -14,7 +14,7 @@ export class RefreshTokenEntity extends BaseEntity {
     @JoinColumn({ name: 'session_id' })
     public session: Relation<SessionEntity>;
 
-    @Column({ type: 'text', comment: 'refresh token hash' })
+    @Column({ type: 'varchar', length: 64, comment: 'sha256 token hash' })
     public token: string;
 
     @Column({ name: 'expires_at', type: 'timestamptz' })
