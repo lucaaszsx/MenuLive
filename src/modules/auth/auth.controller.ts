@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { COOKIE_REFRESH_TOKEN_NAME } from '#/common/constants.js';
 import { UserAgent } from '#/common/decorators/user-agent.decorator.js';
 import { AuthService } from './auth.service.js';
-import { CreateUserDTO, LoginDTO, LoginResponseDTO } from './dto/index.js';
+import { CreateUserDTO, LoginDTO } from './dto/index.js';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +29,7 @@ export class AuthController {
         @Ip() ipAddress: string,
         @UserAgent() userAgent: string,
         @Res({ passthrough: true }) response: Response
-    ): Promise<LoginResponseDTO> {
+    ) {
         const { refreshToken, accessToken } = await this.authService.login({
             username: data.username,
             password: data.password,
@@ -45,6 +45,6 @@ export class AuthController {
             path: '/'
         });
 
-        return LoginResponseDTO.from({ accessToken });
+        return { accessToken };
     }
 }
