@@ -36,7 +36,10 @@ export class AuthService {
     }
 
     public async login(data: LoginInput) {
-        const user = await this.userService.findWithPassword({ username: data.username });
+        const user = await this.userService.findWithPassword({
+            username: data.username,
+            throwErrorOnNull: false
+        });
         if (!user || !(await bcrypt.compare(data.password, user.password)))
             throw new InvalidCredentialsException();
 
