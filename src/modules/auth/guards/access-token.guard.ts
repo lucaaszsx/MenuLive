@@ -6,10 +6,14 @@ import { UnauthorizedException } from '../exceptions/unauthorized.exception.js';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt-access') {
-    override handleRequest<TUser = JwtTokenPayload>(err: any, user: TUser): TUser {
-        if (err instanceof TokenExpiredError)
+    override handleRequest<TUser = JwtTokenPayload>(
+        err: any,
+        user: TUser,
+        info: any
+    ): TUser {
+        if (info instanceof TokenExpiredError)
             throw new UnauthorizedException(['Access token expired']);
-        if (err && !user) throw new UnauthorizedException(['Invalid access token']);
+        if (err || !user) throw new UnauthorizedException(['Invalid access token']);
         return user;
     }
 }

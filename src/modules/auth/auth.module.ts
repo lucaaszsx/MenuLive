@@ -14,7 +14,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy.js';
     imports: [
         TypeOrmModule.forFeature([SessionEntity, RefreshTokenEntity]),
         JwtModule.register({}),
-        PassportModule,
+        PassportModule.register({}),
         UserModule
     ],
     controllers: [AuthController],

@@ -10,7 +10,7 @@ export interface CreateUserInput {
     password: string;
 }
 
-export type FindOneUserInput = { throwErrorOnNull?: boolean } & (
+export type FindOneUserInput = { throwErrorOnNull: boolean } & (
     { id: string; username?: never } | { id?: never; username: string }
 );
 
@@ -34,14 +34,15 @@ export class UserService {
         if (options.id) where.push({ id: options.id });
         if (options.username) where.push({ username: options.username });
 
-        const user = await this.userRepository.findOne({ where });
+        const user =
+            where.length > 0 ? await this.userRepository.findOne({ where }) : null;
         if (!user && options.throwErrorOnNull) throw new UserNotFoundException();
 
         return user;
     }
 
     public async findWithPassword(options: FindOneUserInput) {
-        const query = await this.userRepository
+        const query = this.userRepository
             .createQueryBuilder('user')
             .addSelect('user.password');
 
@@ -49,7 +50,7 @@ export class UserService {
         if (options.username)
             query.orWhere('user.username = :username', { username: options.username });
 
-        const user = query.getOne();
+        const user = query.expressionMap.wheres.length > 0 ? await query.getOne() : null;
         if (!user && options.throwErrorOnNull) throw new UserNotFoundException();
 
         return user;
