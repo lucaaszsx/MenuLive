@@ -17,6 +17,7 @@ import { CurrentUser } from '#/common/decorators/current-user-decorator.js';
 import { UserAgent } from '#/common/decorators/user-agent.decorator.js';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO, LoginDTO } from './dto/index.js';
+import { RefreshTokenInvalidException } from './exceptions/refresh-token-invalid.js';
 import { RefreshTokenGuard } from './guards/refresh-token.guard.js';
 
 @Controller('auth')
@@ -59,10 +60,16 @@ export class AuthController {
         @CurrentUser() payload: JwtTokenPayload,
         @Res({ passthrough: true }) response: Response
     ) {
-        const { refreshToken, accessToken } = await this.authService.refresh(payload);
-        this.setRefreshCookie(response, refreshToken);
+        try {
+            const { refreshToken, accessToken } = await this.authService.refresh(payload);
+            this.setRefreshCookie(response, refreshToken);
 
-        return { accessToken };
+            return { accessToken };
+        } catch (error) {
+            if (error instanceof RefreshTokenInvalidException)
+                response.clearCookie(COOKIE_REFRESH_TOKEN_NAME);
+            throw error;
+        }
     }
 
     private setRefreshCookie(response: Response, refreshToken: string) {
