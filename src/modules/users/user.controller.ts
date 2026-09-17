@@ -11,7 +11,6 @@ export class UserController {
     @UseGuards(AccessTokenGuard)
     @Get('/@me')
     public async getMe(@CurrentUser('uid') id: string) {
-        console.log(id);
         const user = await this.userService.findOne({ id, throwErrorOnNull: true });
         return UserResponseDTO.from(user!);
     }
