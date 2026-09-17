@@ -2,7 +2,8 @@ import type { JwtTokenPayload } from '../types/jwt-payload.type.js';
 import { Injectable } from '@nestjs/common';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { UnauthorizedException } from '../exceptions/unauthorized.exception.js';
+import { AccessTokenExpiredException } from '../exceptions/access-token-expired.exception.js';
+import { AccessTokenInvalidException } from '../exceptions/access-token-invalid.js';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt-access') {
@@ -11,9 +12,8 @@ export class AccessTokenGuard extends AuthGuard('jwt-access') {
         user: TUser,
         info: any
     ): TUser {
-        if (info instanceof TokenExpiredError)
-            throw new UnauthorizedException(['Access token expired']);
-        if (err || !user) throw new UnauthorizedException(['Invalid access token']);
+        if (info instanceof TokenExpiredError) throw new AccessTokenExpiredException();
+        if (err || !user) throw new AccessTokenInvalidException();
         return user;
     }
 }
