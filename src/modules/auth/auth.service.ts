@@ -68,24 +68,23 @@ export class AuthService {
         if (!(await this.userService.exists({ id: payload.uid })))
             throw new RefreshTokenInvalidException();
 
-        return new Promise<{ refreshToken: string; accessToken: string }>(
-            async (resolve) => {
-                await this.dataSource.transaction(async (manager) => {
-                    await manager.update(
-                        RefreshTokenEntity,
-                        { sessionId: payload.sid, revoked: false },
-                        { revoked: true }
-                    );
-
-                    const { refreshToken, accessToken } = await this.createRefreshToken(
-                        manager,
-                        payload.uid,
-                        payload.sid
-                    );
-                    resolve({ refreshToken, accessToken });
-                });
+        return this.dataSource.transaction(async (manager) => {
+            const { affected } = await manager.update(
+                RefreshTokenEntity,
+                { sessionId: payload.sid, revoked: false },
+                { revoked: true }
+            );
+            if (affected === 0) {
+                await manager.update(
+                    RefreshTokenEntity,
+                    { sessionId: payload.sid },
+                    { revoked: true }
+                );
+                throw new RefreshTokenInvalidException();
             }
-        );
+
+            return this.createRefreshToken(manager, payload.uid, payload.sid);
+        });
     }
 
     public getRefreshTokenTtlMs() {
