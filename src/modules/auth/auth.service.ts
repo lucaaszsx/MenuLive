@@ -12,8 +12,8 @@ import { UserService } from '../users/user.service.js';
 import { RefreshTokenEntity } from './entities/refresh-token.entity.js';
 import { SessionEntity } from './entities/session.entity.js';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception.js';
-import { createHash } from 'node:crypto';
 import { RefreshTokenInvalidException } from './exceptions/refresh-token-invalid.js';
+import { createHash } from 'node:crypto';
 
 export interface LoginInput {
     username: string;
@@ -43,25 +43,16 @@ export class AuthService {
         if (!user || !(await bcrypt.compare(data.password, user.password)))
             throw new InvalidCredentialsException();
 
-        return new Promise<{ refreshToken: string; accessToken: string }>(
-            async (resolve) => {
-                await this.dataSource.transaction(async (manager) => {
-                    const dbSession = manager.create(SessionEntity, {
-                        userId: user.id,
-                        userAgent: data.userAgent,
-                        ipAddress: data.ipAddress
-                    });
-                    await manager.save(SessionEntity, dbSession);
+        return this.dataSource.transaction(async (manager) => {
+            const dbSession = manager.create(SessionEntity, {
+                userId: user.id,
+                userAgent: data.userAgent,
+                ipAddress: data.ipAddress
+            });
+            await manager.save(SessionEntity, dbSession);
 
-                    const { refreshToken, accessToken } = await this.createRefreshToken(
-                        manager,
-                        user.id,
-                        dbSession.id
-                    );
-                    resolve({ refreshToken, accessToken });
-                });
-            }
-        );
+            return this.createRefreshToken(manager, user.id, dbSession.id);
+        });
     }
 
     public async refresh(payload: JwtTokenPayload) {
