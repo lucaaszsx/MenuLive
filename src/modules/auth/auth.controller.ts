@@ -1,11 +1,23 @@
 import type { Response } from 'express';
 import type { EnvConfig } from '#/config/env.js';
-import { Body, Controller, HttpCode, HttpStatus, Ip, Post, Res } from '@nestjs/common';
+import type { JwtTokenPayload } from './types/jwt-payload.type.js';
+import {
+    Body,
+    Controller,
+    HttpCode,
+    HttpStatus,
+    Ip,
+    Post,
+    Res,
+    UseGuards
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { COOKIE_REFRESH_TOKEN_NAME } from '#/common/constants.js';
+import { CurrentUser } from '#/common/decorators/current-user-decorator.js';
 import { UserAgent } from '#/common/decorators/user-agent.decorator.js';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO, LoginDTO } from './dto/index.js';
+import { RefreshTokenGuard } from './guards/refresh-token.guard.js';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +48,24 @@ export class AuthController {
             ipAddress,
             userAgent
         });
+        this.setRefreshCookie(response, refreshToken);
 
+        return { accessToken };
+    }
+
+    @UseGuards(RefreshTokenGuard)
+    @Post('/refresh')
+    public async refresh(
+        @CurrentUser() payload: JwtTokenPayload,
+        @Res({ passthrough: true }) response: Response
+    ) {
+        const { refreshToken, accessToken } = await this.authService.refresh(payload);
+        this.setRefreshCookie(response, refreshToken);
+
+        return { accessToken };
+    }
+
+    private setRefreshCookie(response: Response, refreshToken: string) {
         response.cookie(COOKIE_REFRESH_TOKEN_NAME, refreshToken, {
             httpOnly: true,
             secure: this.configService.getOrThrow('env') === 'production',
@@ -44,7 +73,5 @@ export class AuthController {
             sameSite: 'lax',
             path: '/'
         });
-
-        return { accessToken };
     }
 }

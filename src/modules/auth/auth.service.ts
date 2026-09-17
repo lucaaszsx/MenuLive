@@ -1,6 +1,5 @@
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 import type { EnvConfig } from '#/config/env.js';
-import type { UserEntity } from '../users/entities/user.entity.js';
 import type { CreateUserInput } from '../users/user.service.js';
 import type { JwtTokenPayload } from './types/jwt-payload.type.js';
 import { Injectable } from '@nestjs/common';
@@ -9,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectDataSource } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import ms from 'ms';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception.js';
 import { UserService } from '../users/user.service.js';
 import { RefreshTokenEntity } from './entities/refresh-token.entity.js';
 import { SessionEntity } from './entities/session.entity.js';
@@ -53,15 +53,35 @@ export class AuthService {
                     });
                     await manager.save(SessionEntity, dbSession);
 
-                    const { hashedRefreshToken, refreshToken, accessToken } =
-                        await this.issueTokenPair(user, dbSession);
-                    const dbRefreshToken = manager.create(RefreshTokenEntity, {
-                        sessionId: dbSession.id,
-                        expiresAt: new Date(Date.now() + this.getRefreshTokenTtlMs()),
-                        token: hashedRefreshToken
-                    });
-                    await manager.save(RefreshTokenEntity, dbRefreshToken);
+                    const { refreshToken, accessToken } = await this.createRefreshToken(
+                        manager,
+                        user.id,
+                        dbSession.id
+                    );
+                    resolve({ refreshToken, accessToken });
+                });
+            }
+        );
+    }
 
+    public async refresh(payload: JwtTokenPayload) {
+        if (!(await this.userService.exists({ id: payload.uid })))
+            throw new UserNotFoundException();
+
+        return new Promise<{ refreshToken: string; accessToken: string }>(
+            async (resolve) => {
+                await this.dataSource.transaction(async (manager) => {
+                    await manager.update(
+                        RefreshTokenEntity,
+                        { sessionId: payload.sid, revoked: false },
+                        { revoked: true }
+                    );
+
+                    const { refreshToken, accessToken } = await this.createRefreshToken(
+                        manager,
+                        payload.uid,
+                        payload.sid
+                    );
                     resolve({ refreshToken, accessToken });
                 });
             }
@@ -76,8 +96,25 @@ export class AuthService {
         );
     }
 
-    private async issueTokenPair(user: UserEntity, session: SessionEntity) {
-        const payload: JwtTokenPayload = { uid: user.id, sid: session.id };
+    private async createRefreshToken(
+        manager: EntityManager,
+        userId: string,
+        sessionId: string
+    ) {
+        const { hashedRefreshToken, refreshToken, accessToken } =
+            await this.issueTokenPair(userId, sessionId);
+        const dbRefreshToken = manager.create(RefreshTokenEntity, {
+            sessionId,
+            expiresAt: new Date(Date.now() + this.getRefreshTokenTtlMs()),
+            token: hashedRefreshToken
+        });
+        await manager.save(RefreshTokenEntity, dbRefreshToken);
+
+        return { refreshToken, accessToken };
+    }
+
+    private async issueTokenPair(userId: string, sessionId: string) {
+        const payload: JwtTokenPayload = { uid: userId, sid: sessionId };
         const accessToken = await this.jwtService.signAsync(payload, {
             secret: this.configService.getOrThrow('jwt.accessTokenSecret', {
                 infer: true

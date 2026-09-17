@@ -22,7 +22,7 @@ export class UserService {
     ) {}
 
     public async createUser(data: CreateUserInput) {
-        if (await this.existsByUsername(data.username))
+        if (await this.exists({ username: data.username }))
             throw new UserAlreadyExistsException();
 
         const user = this.userRepository.create(data);
@@ -56,11 +56,11 @@ export class UserService {
         return user;
     }
 
-    public async existsById(id: string) {
-        return this.userRepository.existsBy({ id });
-    }
+    public async exists(options: Omit<FindOneUserInput, 'throwErrorOnNull'>) {
+        const where: FindOptionsWhere<UserEntity>[] = [];
+        if (options.id) where.push({ id: options.id });
+        if (options.username) where.push({ username: options.username });
 
-    public async existsByUsername(username: string) {
-        return this.userRepository.existsBy({ username });
+        return where.length > 0 ? await this.userRepository.exists({ where }) : false;
     }
 }
