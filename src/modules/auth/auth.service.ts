@@ -8,12 +8,12 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectDataSource } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import ms from 'ms';
-import { UserNotFoundException } from '../users/exceptions/user-not-found.exception.js';
 import { UserService } from '../users/user.service.js';
 import { RefreshTokenEntity } from './entities/refresh-token.entity.js';
 import { SessionEntity } from './entities/session.entity.js';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception.js';
 import { createHash } from 'node:crypto';
+import { RefreshTokenInvalidException } from './exceptions/refresh-token-invalid.js';
 
 export interface LoginInput {
     username: string;
@@ -66,7 +66,7 @@ export class AuthService {
 
     public async refresh(payload: JwtTokenPayload) {
         if (!(await this.userService.exists({ id: payload.uid })))
-            throw new UserNotFoundException();
+            throw new RefreshTokenInvalidException();
 
         return new Promise<{ refreshToken: string; accessToken: string }>(
             async (resolve) => {
